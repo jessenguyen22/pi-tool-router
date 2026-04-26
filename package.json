@@ -1,0 +1,67 @@
+{
+  "name": "pi-tool-router",
+  "version": "0.1.0",
+  "description": "Intelligent tool routing extension for pi coding agent - automatically selects the best tool stack for each task",
+  "keywords": [
+    "pi-extension",
+    "pi-package",
+    "tool-routing",
+    "ai-agent",
+    "multi-agent",
+    "orchestration",
+    "coding-agent"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Your Name",
+    "email": "your@email.com",
+    "url": "https://github.com/your-username"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/pi-tool-router"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/pi-tool-router/issues"
+  },
+  "homepage": "https://github.com/your-username/pi-tool-router#readme",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": {
+      "import": "./index.ts"
+    }
+  },
+  "scripts": {
+    "dev": "pi dev",
+    "test": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:e2e": "vitest run tests/e2e",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "build": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": ">=0.70.0"
+  },
+  "devDependencies": {
+    "@mariozechner/pi-coding-agent": "^0.70.2",
+    "@types/eventemitter3": "^1.2.0",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.4"
+  }
+}
