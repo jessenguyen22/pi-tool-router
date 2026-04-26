@@ -80,7 +80,8 @@ jobs:
             echo "npm publish exited with code: $EXIT_CODE"
             
             # Check npm logs for 403 (already published) vs other errors
-            if ls /home/runner/.npm/_logs/*debug*.log 2>/dev/null | head -1 | xargs grep -q "403 Forbidden\|cannot publish over the previously published" 2>/dev/null; then
+            LOG_FILE=$(ls -t /home/runner/.npm/_logs/*.log 2>/dev/null | head -1)
+            if [ -n "$LOG_FILE" ] && grep -qE "403 Forbidden|cannot publish over the previously published" "$LOG_FILE" 2>/dev/null; then
               echo "✅ Version ${VERSION_TAG} already exists on npm (403 = expected)"
               exit 0
             fi
