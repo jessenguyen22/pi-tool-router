@@ -76,7 +76,7 @@ export interface ValidationResult {
 }
 
 // ============================================================================
-// Default Configuration
+// Improved Routing Rules - Better edge case handling
 // ============================================================================
 
 export const DEFAULT_CONFIG: RouterConfig = {
@@ -101,6 +101,83 @@ export const DEFAULT_CONFIG: RouterConfig = {
 		code_search: 8,
 	},
 	routingRules: [
+		// ========================================
+		// NEGATION HANDLING
+		// ========================================
+		{
+			id: "negation-rule",
+			name: "Negation - Exclude Tools",
+			enabled: true,
+			priority: 10,
+			match: {
+				queryPatterns: [
+					"don't use",
+					"do not use",
+					"avoid",
+					"don't use web",
+					"avoid bash",
+					"without web",
+					"skip web",
+					"not web search",
+				],
+				capabilities: [],
+			},
+			preferredTools: ["read", "code_search"],
+		},
+		// ========================================
+		// EXECUTION RULES
+		// ========================================
+		{
+			id: "execution-rule",
+			name: "Command Execution",
+			enabled: true,
+			priority: 10,
+			match: {
+				queryPatterns: [
+					// Explicit commands
+					"run ",
+					"execute ",
+					"install ",
+					"build ",
+					"test ",
+					"start ",
+					// Package managers
+					"npm ",
+					"yarn ",
+					"pnpm ",
+					"git ",
+					// Shell patterns
+					"command",
+					"shell",
+					"terminal",
+					// Install patterns
+					"install it",
+					"install dependencies",
+					"install packages",
+					// Run patterns
+					"run the build",
+					"run tests",
+					"run npm",
+					// Git patterns
+					"pull the code",
+					"git clone",
+					"git push",
+					"git pull",
+					"checkout ",
+					"diff between",
+					// Dev patterns
+					"dev server",
+					"hot reload",
+					"compile",
+					"deploy",
+				],
+				capabilities: ["bash_exec"],
+			},
+			preferredTools: ["bash"],
+		},
+		// ========================================
+		// WEB SEARCH (general info queries)
+		// ========================================
 		{
 			id: "web-search-rule",
 			name: "Web Search & Information",
@@ -110,7 +187,7 @@ export const DEFAULT_CONFIG: RouterConfig = {
 				queryPatterns: [
 					"news",
 					"latest",
-					"current",
+					"current ",
 					"price",
 					"weather",
 					"stock",
@@ -122,11 +199,17 @@ export const DEFAULT_CONFIG: RouterConfig = {
 					"information",
 					"about",
 					"explain",
+					"maybe",
+					"probably",
+					"search for ",
 				],
 				capabilities: ["web_search"],
 			},
 			preferredTools: ["web_search", "ollama_web_search", "fetch_content"],
 		},
+		// ========================================
+		// CODE SEARCH (function, class, implementation)
+		// ========================================
 		{
 			id: "code-search-rule",
 			name: "Code Search & Analysis",
@@ -135,7 +218,7 @@ export const DEFAULT_CONFIG: RouterConfig = {
 			match: {
 				queryPatterns: [
 					"function",
-					"class",
+					"class ",
 					"method",
 					"api",
 					"implementation",
@@ -144,23 +227,36 @@ export const DEFAULT_CONFIG: RouterConfig = {
 					"trace",
 					"usage",
 					"where is",
-					"import",
-					"export",
-					"interface",
+					"import ",
+					"export ",
+					"interface ",
 					"type ",
 					"search for",
 					"hooks",
 					"react ",
+					"grep ",
+					"find the function",
+					"find files",
+					"find some files",
+					"bugs",
+					"logs for",
+					"exceptions",
+					"regex",
+					"*.ts",
+					"*.js",
 				],
 				capabilities: ["code_search", "code_analysis"],
 			},
 			preferredTools: ["code_search", "grep", "read"],
 		},
+		// ========================================
+		// FILE READ (explicit read commands)
+		// ========================================
 		{
 			id: "file-read-rule",
 			name: "File Reading",
 			enabled: true,
-			priority: 8,
+			priority: 9,
 			match: {
 				queryPatterns: [
 					"read",
@@ -170,11 +266,21 @@ export const DEFAULT_CONFIG: RouterConfig = {
 					"cat ",
 					"open file",
 					"contents of",
+					"fetch me the docs",
+					"grab the",
+					// Vietnamese
+					"đọc",
+					"đọc file",
+					// Vietnamese patterns
+					"tìm file",
 				],
 				capabilities: ["file_read"],
 			},
-			preferredTools: ["read"],
+			preferredTools: ["read", "fetch_content"],
 		},
+		// ========================================
+		// FILE EDIT (explicit write/modify)
+		// ========================================
 		{
 			id: "file-edit-rule",
 			name: "File Edit Operations",
@@ -188,32 +294,16 @@ export const DEFAULT_CONFIG: RouterConfig = {
 					"update file",
 					"write to",
 					"create file",
+					"then edit",
+					"based on content",
 				],
 				capabilities: ["file_edit", "file_write"],
 			},
 			preferredTools: ["edit", "write"],
 		},
-		{
-			id: "execution-rule",
-			name: "Command Execution",
-			enabled: true,
-			priority: 10,
-			match: {
-				queryPatterns: [
-					"run ",
-					"execute ",
-					"command",
-					"install ",
-					"build ",
-					"test ",
-					"npm ",
-					"git ",
-					"start ",
-				],
-				capabilities: ["bash_exec"],
-			},
-			preferredTools: ["bash"],
-		},
+		// ========================================
+		// WEB FETCH (URL content)
+		// ========================================
 		{
 			id: "web-fetch-rule",
 			name: "Web Content Fetch",
@@ -226,29 +316,31 @@ export const DEFAULT_CONFIG: RouterConfig = {
 					"visit url",
 					"read webpage",
 					"extract from",
+					"https://",
+					"http://",
 				],
 				capabilities: ["web_fetch"],
 			},
 			preferredTools: ["fetch_content", "ollama_web_fetch"],
 		},
-		{
-			id: "parallel-rule",
-			name: "Parallel Processing",
-			enabled: true,
-			priority: 7,
-			match: {
-				queryPatterns: ["parallel", "concurrent", "async", "multiple tasks"],
-				capabilities: ["subagent"],
-			},
-			preferredTools: ["subagent", "bash"],
-		},
+		// ========================================
+		// USER INPUT (clarification needed)
+		// ========================================
 		{
 			id: "user-input-rule",
 			name: "User Interaction",
 			enabled: true,
-			priority: 6,
+			priority: 5,
 			match: {
-				queryPatterns: ["ask", "confirm", "choose", "decide", "user input"],
+				queryPatterns: [
+					"ask",
+					"confirm",
+					"choose",
+					"decide",
+					"should I use",
+					"user input",
+					"?",
+				],
 				capabilities: ["user_interaction"],
 			},
 			preferredTools: ["ask_user"],
