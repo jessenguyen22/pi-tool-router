@@ -66,7 +66,7 @@ export class Router {
 		const rules = this.config.getRoutingRules();
 
 		// Determine strategy to use
-		const strategy = this.resolveStrategy(context.strategy, routerConfig);
+		const strategy = this._resolveStrategy(context.strategy, routerConfig);
 
 		// Find matching rules
 		const matchedRules = this.matcher.matchRules(context.query, rules, {
@@ -142,7 +142,7 @@ export class Router {
 	/**
 	 * Resolve effective strategy
 	 */
-	private resolveStrategy(
+	private _resolveStrategy(
 		requested: RoutingStrategyType | undefined,
 		config: {
 			defaultStrategy?: string;
@@ -163,7 +163,11 @@ export class Router {
 	}
 
 	/**
-	 * Select tool by priority
+	 * Select tool by priority - CAPABILITY-BASED
+	 *
+	 * Now works with ANY user's available tools by matching capabilities.
+	 * User A with 'ollama_web_search' → works
+	 * User B with 'tavily_search' → also works!
 	 */
 	private selectByPriority(
 		tools: ToolInfo[],
@@ -172,38 +176,81 @@ export class Router {
 	): { tool: ToolInfo; confidence: number; reasoning: string[] } {
 		const reasoning: string[] = [];
 
-		// Sort by priority from rules first
-		const rulePriorities = new Map<string, number>();
+		// Extract ALL required capabilities from matched rules
+		const requiredCapabilities = new Set<ToolCapability>();
+		const toolPriorityBonus = new Map<string, number>();
+
 		for (const rule of matchedRules) {
+			// Add required capabilities
+			if (rule.match?.capabilities) {
+				rule.match.capabilities.forEach((c) =>
+					requiredCapabilities.add(c as ToolCapability),
+				);
+			}
+			// Add priority bonus for tools that match preferred tools
 			for (const toolName of rule.preferredTools) {
-				const current = rulePriorities.get(toolName) || 0;
-				rulePriorities.set(toolName, Math.max(current, rule.priority));
+				const current = toolPriorityBonus.get(toolName) || 0;
+				toolPriorityBonus.set(toolName, Math.max(current, rule.priority));
 			}
 		}
 
-		// Filter available tools and sort
-		const availableTools = tools
+		// Score tools based on:
+		// 1. Tool has required capability
+		// 2. Tool matches one of the preferred tools in rules
+		// 3. Base tool priority
+		const scoredTools = tools
 			.filter((t) => t.isAvailable)
-			.map((t) => ({
-				tool: t,
-				effectivePriority:
-					(rulePriorities.get(t.name) || 0) * 10 + t.priority + t.weight,
-			}))
+			.map((t) => {
+				// Calculate capability match score
+				const toolCapabilities = TOOL_CAPABILITIES[t.name] || t.capabilities;
+				const capabilityMatches = [...requiredCapabilities].filter((c) =>
+					toolCapabilities.includes(c),
+				).length;
+				const capabilityScore =
+					requiredCapabilities.size > 0
+						? capabilityMatches / requiredCapabilities.size
+						: 1;
+
+				// Preferred tool bonus
+				const preferredBonus = toolPriorityBonus.get(t.name) || 0;
+
+				// Base priority from tool definition
+				const basePriority = t.priority + t.weight;
+
+				// Combined effective score
+				const effectivePriority =
+					preferredBonus * 10 + capabilityScore * 20 + basePriority;
+
+				return {
+					tool: t,
+					effectivePriority,
+					capabilityScore,
+					hasCapability: capabilityScore > 0,
+				};
+			})
+			// Filter to only tools that have at least one matching capability
+			.filter((t) => t.hasCapability)
 			.sort((a, b) => b.effectivePriority - a.effectivePriority);
 
-		if (availableTools.length === 0) {
-			throw new Error("No available tools for routing");
+		if (scoredTools.length === 0) {
+			// Fallback: return any available tool
+			const fallback = tools.find((t) => t.isAvailable);
+			if (!fallback) {
+				throw new Error("No available tools for routing");
+			}
+			reasoning.push(`No capability match, using fallback: ${fallback.name}`);
+			return { tool: fallback, confidence: 0.3, reasoning };
 		}
 
-		const selected = availableTools[0].tool;
-		const confidence = Math.min(
-			0.95,
-			availableTools[0].effectivePriority / 100,
-		);
+		const selected = scoredTools[0].tool;
+		const confidence = Math.min(0.95, scoredTools[0].effectivePriority / 100);
 
 		reasoning.push(`Selected by priority: ${selected.name}`);
 		reasoning.push(
-			`Rule-based priority: ${availableTools[0].effectivePriority.toFixed(1)}`,
+			`Capabilities matched: ${[...requiredCapabilities].join(", ") || "any"}`,
+		);
+		reasoning.push(
+			`Rule-based priority: ${scoredTools[0].effectivePriority.toFixed(1)}`,
 		);
 
 		return { tool: selected, confidence, reasoning };
@@ -417,7 +464,7 @@ export class Router {
 	/**
 	 * Match tool capabilities to query
 	 */
-	private matchCapabilities(tool: ToolInfo, query: string): number {
+	private _matchCapabilities(tool: ToolInfo, query: string): number {
 		const toolCaps = tool.capabilities;
 		const inferredCaps = this.inferCapabilities(query);
 
