@@ -2,7 +2,7 @@
 
 **Intelligent tool routing extension for pi coding agent**
 
-[![npm version](https://img.shields.io/npm/v/pi-tool-router.svg)](https://www.npmjs.com/package/pi-tool-router)
+[![npm version](https://img.shields.io/npm/v/@jessenguyen22/pi-tool-router.svg)](https://www.npmjs.com/package/@jessenguyen22/pi-tool-router)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/jessenguyen22/pi-tool-router/pulls)
 [![GitHub stars](https://img.shields.io/github/stars/jessenguyen22/pi-tool-router)](https://github.com/jessenguyen22/pi-tool-router/stargazers)
@@ -43,13 +43,10 @@
 
 ```bash
 # Global installation
-pi install npm:pi-tool-router
+pi install npm:@jessenguyen22/pi-tool-router
 
 # Project-local installation
-pi install -l npm:pi-tool-router
-
-# From GitHub (latest)
-pi install git:github.com/your-username/pi-tool-router
+pi install -l npm:@jessenguyen22/pi-tool-router
 ```
 
 ## Quick Start
@@ -57,7 +54,7 @@ pi install git:github.com/your-username/pi-tool-router
 ### 1. Install the extension
 
 ```bash
-pi install npm:pi-tool-router
+pi install npm:@jessenguyen22/pi-tool-router
 ```
 
 ### 2. Restart pi
@@ -69,6 +66,7 @@ pi
 ### 3. The extension auto-initializes and registers routing rules
 
 The router will automatically:
+
 - Analyze incoming tasks
 - Select optimal tools based on rules
 - Execute with fallback support
@@ -153,7 +151,7 @@ User: "Search for React performance patterns"
 Force a specific tool:
 
 ```
-User: "Use tavily to search for X"  
+User: "Use tavily to search for X"
 → Router respects: tavily_web_search
 ```
 
@@ -166,6 +164,7 @@ View routing analytics:
 ```
 
 Shows:
+
 - Tool usage frequency
 - Average response times
 - Cost per tool
@@ -196,15 +195,15 @@ Shows:
 
 ### Components
 
-| Component | Description |
-|-----------|-------------|
-| **Router Core** | Central orchestrator, manages routing decisions |
-| **Matcher Engine** | Analyzes task context and matches routing rules |
-| **Executor Manager** | Executes tools with fallback support |
-| **Config Manager** | Loads and validates configuration |
-| **Rules Engine** | Evaluates and prioritizes routing rules |
-| **Tools Registry** | Maintains available tools and their metadata |
-| **Analytics** | Tracks usage, costs, and performance |
+| Component            | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| **Router Core**      | Central orchestrator, manages routing decisions |
+| **Matcher Engine**   | Analyzes task context and matches routing rules |
+| **Executor Manager** | Executes tools with fallback support            |
+| **Config Manager**   | Loads and validates configuration               |
+| **Rules Engine**     | Evaluates and prioritizes routing rules         |
+| **Tools Registry**   | Maintains available tools and their metadata    |
+| **Analytics**        | Tracks usage, costs, and performance            |
 
 ## Routing Strategies
 
@@ -225,14 +224,14 @@ Routes based on tool capabilities matching task requirements.
 Implement your own routing logic:
 
 ```typescript
-import type { RoutingStrategy } from "pi-tool-router";
+import type { RoutingStrategy } from 'pi-tool-router';
 
 const myStrategy: RoutingStrategy = {
-  name: "my-strategy",
+  name: 'my-strategy',
   selectTool(context: RoutingContext): ToolSelection {
     // Custom logic
-    return { toolName: "best-tool", confidence: 0.95 };
-  }
+    return { toolName: 'best-tool', confidence: 0.95 };
+  },
 };
 ```
 
@@ -242,17 +241,17 @@ const myStrategy: RoutingStrategy = {
 
 ```typescript
 // On tool selection
-pi.events.on("tool-router:tool-selected", (tool) => {
+pi.events.on('tool-router:tool-selected', tool => {
   console.log(`Selected: ${tool.name}`);
 });
 
 // On routing decision
-pi.events.on("tool-router:routing-decision", (decision) => {
+pi.events.on('tool-router:routing-decision', decision => {
   console.log(`Decision: ${decision.selectedTool}`);
 });
 
 // On tool execution complete
-pi.events.on("tool-router:tool-complete", (result) => {
+pi.events.on('tool-router:tool-complete', result => {
   console.log(`Completed: ${result.toolName}`);
 });
 ```
@@ -261,14 +260,14 @@ pi.events.on("tool-router:tool-complete", (result) => {
 
 ```typescript
 // Register custom routing strategy
-pi.events.emit("tool-router:register-strategy", myStrategy);
+pi.events.emit('tool-router:register-strategy', myStrategy);
 
 // Register custom tool
-pi.events.emit("tool-router:register-tool", {
-  name: "my-custom-tool",
-  capabilities: ["web", "search"],
+pi.events.emit('tool-router:register-tool', {
+  name: 'my-custom-tool',
+  capabilities: ['web', 'search'],
   cost: 0.001,
-  priority: 5
+  priority: 5,
 });
 ```
 
