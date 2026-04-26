@@ -28,3 +28,4 @@ coverage/
 # Pi specific
 .pi/
 !pi-tool-router/.pi/
+.pi-lens/
