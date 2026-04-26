@@ -74,5 +74,17 @@ jobs:
           echo "Attempting to publish version: ${VERSION_TAG}"
 
           # Attempt to publish - if version exists, npm will fail with 403
-          # GitHub Actions will catch this and fail the job
-          npm publish --access public
+          # We catch 403 and treat it as success since version already exists
+          npm publish --access public || {
+            EXIT_CODE=$?
+            echo "npm publish exited with code: $EXIT_CODE"
+            
+            # Check npm logs for 403 (already published) vs other errors
+            if ls /home/runner/.npm/_logs/*debug*.log 2>/dev/null | head -1 | xargs grep -q "403 Forbidden\|cannot publish over the previously published" 2>/dev/null; then
+              echo "✅ Version ${VERSION_TAG} already exists on npm (403 = expected)"
+              exit 0
+            fi
+            
+            echo "❌ Unexpected publish error"
+            exit $EXIT_CODE
+          }
