@@ -1,0 +1,33 @@
+{
+  "files": {
+    "tests/unit/router.test.ts": {
+      "modifiedRanges": [
+        {
+          "start": 60,
+          "end": 119
+        },
+        {
+          "start": 131,
+          "end": 133
+        },
+        {
+          "start": 145,
+          "end": 147
+        },
+        {
+          "start": 159,
+          "end": 161
+        },
+        {
+          "start": 170,
+          "end": 170
+        }
+      ],
+      "importsChanged": false,
+      "lastEdit": "2026-04-26T10:59:38.432Z"
+    }
+  },
+  "turnCycles": 0,
+  "maxCycles": 3,
+  "lastUpdated": "2026-04-26T10:59:38.432Z"
+}
