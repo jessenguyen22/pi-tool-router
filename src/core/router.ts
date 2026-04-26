@@ -15,7 +15,8 @@ import type {
 import { TOOL_CAPABILITIES } from "./types.js";
 import { Matcher } from "./matcher.js";
 import type { ConfigManager, RoutingRule, RouterConfig } from "../config/index.js";
-import type { Analytics } from "./types.js";
+import type { ToolsRegistry } from "../tools/registry.js";
+import { Analytics } from "../observability/analytics.js";
 
 /**
  * Router Core class
@@ -25,15 +26,19 @@ import type { Analytics } from "./types.js";
  */
 export class Router {
   private config: ConfigManager;
+  private registry: ToolsRegistry;
   private analytics: Analytics;
   private matcher: Matcher;
   private customStrategies: Map<string, unknown> = new Map();
 
+
   constructor(
     config: ConfigManager,
+    registry: ToolsRegistry,
     analytics: Analytics
   ) {
     this.config = config;
+    this.registry = registry;
     this.analytics = analytics;
     this.matcher = new Matcher();
   }
@@ -51,8 +56,8 @@ export class Router {
     const startTime = Date.now();
     const routerConfig = this.config.getConfig();
 
-    // Get all available tools
-    const tools = this.analytics.getAvailableTools();
+    // Get all available tools from registry
+    const tools = this.registry.getAllTools();
 
     // Get active routing rules
     const rules = this.config.getRoutingRules();

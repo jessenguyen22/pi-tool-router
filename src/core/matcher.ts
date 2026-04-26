@@ -11,8 +11,11 @@
  */
 
 import type { RoutingRule } from "../config/index.js";
-import type { RuleMatchContext } from "./types.js";
 import type { ToolCapability } from "./types.js";
+
+interface RuleMatchContext {
+  context?: string;
+}
 
 // ============================================================================
 // Types
@@ -85,7 +88,6 @@ const COMPLEXITY_KEYWORDS: Record<TaskComplexity, string[]> = {
 const CAPABILITY_KEYWORDS: Record<ToolCapability, string[]> = {
   code_analysis: ["function", "class", "method", "code", "implementation", "algorithm", "logic"],
   code_search: ["find", "search", "grep", "locate", "where", "trace", "usage"],
-  code_edit: ["edit", "modify", "change", "update", "fix", "patch", "alter"],
   file_read: ["read", "show", "display", "view", "cat", "contents", "file"],
   file_write: ["create", "write", "new file", "save", "generate"],
   file_edit: ["edit", "modify", "change", "update file"],

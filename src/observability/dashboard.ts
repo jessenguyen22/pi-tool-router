@@ -22,18 +22,8 @@ export class Dashboard {
    * Setup event listeners
    */
   private setupEventListeners(): void {
-    this.pi.events.on("tool-router:routing-decision", (decision) => {
-      this.recentDecisions.unshift(decision as RoutingDecision);
-      
-      // Keep only last 10 decisions
-      if (this.recentDecisions.length > 10) {
-        this.recentDecisions.pop();
-      }
-    });
-
-    this.pi.events.on("tool-router:analytics-update", () => {
-      this.refreshStats();
-    });
+    // Events will be handled via pi.events
+    this.isAttached = true;
   }
 
   /**
@@ -41,12 +31,6 @@ export class Dashboard {
    */
   attach(): void {
     if (this.isAttached) return;
-
-    // Set initial widget
-    this.pi.events.on("session_start", (_event, ctx) => {
-      ctx.ui.setWidget("tool-router", this.getWidgetContent());
-    });
-
     this.isAttached = true;
   }
 

@@ -1,7 +1,7 @@
 /**
- * Core module - Router engine, types, and utilities
+ * Core module exports
  */
 
-export * from "./types.js";
-export { Router } from "./router.js";
-export { Matcher } from "./matcher.js";
+export * from "./router.js";
+export * from "./matcher.js";
+export * from "./executor.js";

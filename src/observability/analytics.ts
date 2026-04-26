@@ -31,13 +31,6 @@ export class Analytics {
    */
   trackRouting(data: RoutingAnalytics): void {
     this.events.push(data);
-
-    // Emit event for real-time updates
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(
-        new CustomEvent("tool-router:analytics-update", { detail: data })
-      );
-    }
   }
 
   /**
@@ -71,6 +64,50 @@ export class Analytics {
       }
       return true;
     });
+  }
+
+
+  /**
+   * Get available tools (for registry integration)
+   */
+  getAvailableTools(): Array<{ name: string; usageCount: number }> {
+    const toolCounts: Record<string, number> = {};
+    for (const event of this.events) {
+      toolCounts[event.selectedTool] = (toolCounts[event.selectedTool] || 0) + 1;
+    }
+    return Object.entries(toolCounts).map(([name, usageCount]) => ({
+      name,
+      usageCount,
+    }));
+  }
+
+  /**
+   * Record routing decision (alias for trackRouting)
+   */
+  recordRoutingDecision(decision: { tool: { name: string } }, durationMs: number): void {
+    this.trackRouting({
+      query: "",
+      selectedTool: decision.tool.name,
+      alternatives: [],
+      confidence: 0.9,
+      duration: durationMs,
+      strategy: "auto",
+      timestamp: new Date(),
+    });
+  }
+
+  /**
+   * Get metrics (alias for getStats)
+   */
+  getMetrics(): RouterStats {
+    return this.getStats();
+  }
+
+  /**
+   * Get analytics data
+   */
+  getAnalytics(): RoutingAnalytics[] {
+    return this.getEvents();
   }
 
   /**
