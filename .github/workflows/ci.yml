@@ -40,7 +40,8 @@ jobs:
   publish:
     needs: lint-and-test
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
+    # Only trigger on release event, not on push to main
+    if: github.event_name == 'release'
 
     steps:
       - uses: actions/checkout@v4
@@ -61,12 +62,15 @@ jobs:
       - name: Publish to npm
         run: |
           # Create .npmrc with auth token for scoped package
+          mkdir -p ~/.npm
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
 
-          # Check if version already exists
-          if npm view @jessenguyen22/pi-tool-router@${{ github.event.release.tag_name }} 2>/dev/null; then
-            echo "Version already published, skipping..."
-          else
-            npm publish --access public
+          # Use npm view exit code properly - 0 means exists, non-0 means doesn't exist
+          if npm view @jessenguyen22/pi-tool-router@${{ github.event.release.tag_name }} 1>/dev/null 2>&1; then
+            echo "Version ${{ github.event.release.tag_name }} already published, skipping..."
+            exit 0
           fi
+
+          echo "Publishing version ${{ github.event.release.tag_name }}..."
+          npm publish --access public
