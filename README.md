@@ -4,7 +4,9 @@
 
 [![npm version](https://img.shields.io/npm/v/pi-tool-router.svg)](https://www.npmjs.com/package/pi-tool-router)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/your-username/pi-tool-router/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/jessenguyen22/pi-tool-router/pulls)
+[![GitHub stars](https://img.shields.io/github/stars/jessenguyen22/pi-tool-router)](https://github.com/jessenguyen22/pi-tool-router/stargazers)
+[![GitHub last commit](https://img.shields.io/github/last-commit/jessenguyen22/pi-tool-router)](https://github.com/jessenguyen22/pi-tool-router/commits)
 
 > 🔀 Automatically select the best tool stack for each task using intelligent routing rules
 
@@ -274,6 +276,19 @@ pi.events.emit("tool-router:register-tool", {
 
 See [examples/](examples/) for complete examples:
 
+## Installation
+
+```bash
+# Global installation
+pi install npm:pi-tool-router
+
+# Project-local installation
+pi install -l npm:pi-tool-router
+
+# From GitHub (latest)
+pi install git:github.com/jessenguyen22/pi-tool-router
+```
+
 - [Basic routing](examples/basic-routing.ts)
 - [Custom strategy](examples/custom-strategy.ts)
 - [Dashboard integration](examples/dashboard.ts)
@@ -301,7 +316,7 @@ npm run dev
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+5. Open a Pull Request to [jessenguyen22/pi-tool-router](https://github.com/jessenguyen22/pi-tool-router/pulls)
 
 ## License
 
@@ -312,9 +327,11 @@ MIT License - see [LICENSE](LICENSE) for details.
 - [pi-coding-agent](https://github.com/mariozechner/pi-coding-agent) - The coding agent this extends
 - [pi-coordinator](https://github.com/skidvis/pi-coordinator) - Multi-agent orchestration
 - [pi-coordination](https://github.com/nicobailon/pi-coordination) - Advanced coordination system
+- [pi-interactive-shell](https://github.com/nicobailon/pi-interactive-shell) - Interactive CLI spawning
 
 ## Support
 
 - 📖 [Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/your-username/pi-tool-router/issues)
-- 💬 [Discussions](https://github.com/your-username/pi-tool-router/discussions)
+- 🐛 [Issue Tracker](https://github.com/jessenguyen22/pi-tool-router/issues)
+- 💬 [Discussions](https://github.com/jessenguyen22/pi-tool-router/discussions)
+- ⭐ [Star on GitHub](https://github.com/jessenguyen22/pi-tool-router)
