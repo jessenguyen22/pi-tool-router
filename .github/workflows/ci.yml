@@ -40,7 +40,6 @@ jobs:
   publish:
     needs: lint-and-test
     runs-on: ubuntu-latest
-    # Only trigger on release event, not on push to main
     if: github.event_name == 'release'
 
     steps:
@@ -51,7 +50,6 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          scope: '@jessenguyen22'
 
       - name: Install dependencies
         run: npm ci
@@ -60,20 +58,21 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          # Create .npmrc with auth token for scoped package
-          mkdir -p ~/.npm
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          # Create .npmrc with auth token (GitHub Actions secrets format)
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
           echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
 
-          # Check if version already exists on registry
-          VERSION_TAG="${{ github.event.release.tag_name }}"
-          echo "Checking if version ${VERSION_TAG} exists on npm..."
+          # Debug: show what's in .npmrc (masked)
+          echo "=== .npmrc (masked) ==="
+          cat ~/.npmrc | sed 's/_authToken=.*/_authToken=***/g'
+          echo "========================"
 
-          if npm view @jessenguyen22/pi-tool-router@${VERSION_TAG} 1>/dev/null 2>&1; then
-            echo "✅ Version ${VERSION_TAG} already published on npm - skipping publish step."
-            exit 0
-          fi
+          VERSION_TAG="${GITHUB_REF#refs/tags/}"
+          echo "Attempting to publish version: ${VERSION_TAG}"
 
-          echo "📦 Version ${VERSION_TAG} not found - publishing to npm..."
+          # Attempt to publish - if version exists, npm will fail with 403
+          # GitHub Actions will catch this and fail the job
           npm publish --access public
