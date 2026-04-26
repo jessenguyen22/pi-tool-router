@@ -66,11 +66,14 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
 
-          # Use npm view exit code properly - 0 means exists, non-0 means doesn't exist
-          if npm view @jessenguyen22/pi-tool-router@${{ github.event.release.tag_name }} 1>/dev/null 2>&1; then
-            echo "Version ${{ github.event.release.tag_name }} already published, skipping..."
+          # Check if version already exists on registry
+          VERSION_TAG="${{ github.event.release.tag_name }}"
+          echo "Checking if version ${VERSION_TAG} exists on npm..."
+
+          if npm view @jessenguyen22/pi-tool-router@${VERSION_TAG} 1>/dev/null 2>&1; then
+            echo "✅ Version ${VERSION_TAG} already published on npm - skipping publish step."
             exit 0
           fi
 
-          echo "Publishing version ${{ github.event.release.tag_name }}..."
+          echo "📦 Version ${VERSION_TAG} not found - publishing to npm..."
           npm publish --access public
