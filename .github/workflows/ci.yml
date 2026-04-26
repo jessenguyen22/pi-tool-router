@@ -60,10 +60,13 @@ jobs:
 
       - name: Publish to npm
         run: |
+          # Create .npmrc with auth token for scoped package
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
+
+          # Check if version already exists
           if npm view @jessenguyen22/pi-tool-router@${{ github.event.release.tag_name }} 2>/dev/null; then
             echo "Version already published, skipping..."
           else
             npm publish --access public
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
