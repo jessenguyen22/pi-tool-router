@@ -21,9 +21,8 @@ npm-debug.log*
 # Test coverage
 coverage/
 
-# Temporary files
-*.tmp
-*.temp
+# Pi lens cache
+.pi-lens/
 
 # Pi specific
 .pi/
